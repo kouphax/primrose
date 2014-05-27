@@ -6,13 +6,13 @@ A bunch of __experimental__ utility functions for working with futures.
 
 ### In-progress
 
-- `primrose.core/first`
-- `primrose.core/first-of`
+- `primrose.core/select-one`
+- `primrose.core/select-many`
 - `primrose.core/all`
+- `primrose.core/first`
 
 ### TBD
 
-- `primrose.core/all-of`
 - `primrose.core/take`
 - `primrose.core/drop`
 - `primrose.core/excluding`
