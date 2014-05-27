@@ -2,6 +2,8 @@
 
 A bunch of __experimental__ utility functions for working with futures.
 
+[API Documentation](https://rawgit.com/kouphax/primrose/master/doc/index.html)(Temporary Location)
+
 ## Usage
 
 ### In-progress
