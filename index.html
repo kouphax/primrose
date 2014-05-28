@@ -1,0 +1,191 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Primrose by kouphax</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Primrose</h1>
+        <p>Promise/Future utility functions</p>
+
+        <p class="view"><a href="https://github.com/kouphax/primrose">View the Project on GitHub <small>kouphax/primrose</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/kouphax/primrose/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/kouphax/primrose/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/kouphax/primrose">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="primrose" class="anchor" href="#primrose"><span class="octicon octicon-link"></span></a>primrose</h1>
+
+<p>A bunch of <strong>experimental</strong> utility functions for working with collections of futures.</p>
+
+<p><a href="https://rawgit.com/kouphax/primrose/master/doc/index.html">API Documentation</a> (Temporary Location)</p>
+
+<h2>
+<a name="getting-it" class="anchor" href="#getting-it"><span class="octicon octicon-link"></span></a>Getting it</h2>
+
+<p>Primrose is available via <a href="https://clojars.org/primrose">Clojars</a></p>
+
+<p>Leiningen</p>
+
+<div class="highlight highlight-clojure"><pre><span class="p">[</span><span class="nv">primrose</span> <span class="s">"0.1.0"</span><span class="p">]</span>
+</pre></div>
+
+<p>Maven</p>
+
+<div class="highlight highlight-xml"><pre><span class="nt">&lt;dependency&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>primrose<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>primrose<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;version&gt;</span>0.1.0<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>Primrose has a very minimal API for working with collections of futures.  The core of the entire library revolves around 2 functions <code>select-one</code> and <code>select-many</code>.  They both behave in the same way</p>
+
+<ol>
+<li>They take a sequence of futures</li>
+<li>They return a promise that will be <strong>delivered</strong> when the method logic dictates.</li>
+</ol><p>You can import the module diretly</p>
+
+<div class="highlight highlight-clojure"><pre><span class="p">(</span><span class="ss">:require</span> <span class="p">[</span><span class="nv">primrose.core</span> <span class="ss">:as</span> <span class="nv">primrose</span><span class="p">])</span>
+</pre></div>
+
+<p>The namespace contains a method called <code>first</code> which will produce a warning if you import the module via <code>:refer :all</code></p>
+
+<div class="highlight highlight-clojure"><pre><span class="p">(</span><span class="ss">:require</span> <span class="p">[</span><span class="nv">primrose.core</span> <span class="ss">:refer</span> <span class="ss">:all</span><span class="p">])</span>
+
+<span class="c1">; WARNING: first already refers to: #'clojure.core/first in namespace: user, being replaced by: #'primrose.core/first</span>
+</pre></div>
+
+<p>I suggest using only the methods you need or namespacing the imported module (as above) but if this is the way you want to import primrose then you can silence the warning via <code>:refer-clojure :exclude</code></p>
+
+<div class="highlight highlight-clojure"><pre><span class="p">(</span><span class="kd">ns </span><span class="nv">myapp.core</span>
+  <span class="p">(</span><span class="ss">:require</span> <span class="p">[</span><span class="nv">primrose.core</span> <span class="ss">:refer</span> <span class="ss">:all</span><span class="p">])</span>
+  <span class="p">(</span><span class="ss">:refer-clojure</span> <span class="ss">:exclude</span> <span class="p">[</span><span class="nv">first</span><span class="p">]))</span>
+</pre></div>
+
+<h3>
+<a name="select-one" class="anchor" href="#select-one"><span class="octicon octicon-link"></span></a><code>select-one</code>
+</h3>
+
+<p><code>select-one</code> takes a predicate and a set of futures and returns a promise that will eventually hold the value of the first future to return whos result is true for the given predicate.</p>
+
+<div class="highlight highlight-clojure"><pre><span class="p">(</span><span class="k">def </span><span class="nv">first-good-result</span>
+  <span class="p">(</span><span class="nf">select-one</span> 
+    <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">response</span><span class="p">]</span> <span class="p">(</span><span class="nb">= </span><span class="mi">200</span> <span class="p">(</span><span class="ss">:status</span> <span class="nv">response</span><span class="p">))</span>
+    <span class="p">(</span><span class="nf">get-async</span> <span class="s">"http://google.com?q=spoons"</span><span class="p">)</span>
+    <span class="p">(</span><span class="nf">get-async</span> <span class="s">"http://yahoo.com?q=spoons"</span><span class="p">)</span>
+    <span class="p">(</span><span class="nf">get-async</span> <span class="s">"http://duckduckgo.com?q=spoons"</span><span class="p">)))</span>
+
+<span class="p">(</span><span class="nb">println </span><span class="p">(</span><span class="ss">:host</span> <span class="o">@</span><span class="nv">first-good-result</span><span class="p">))</span>
+<span class="nv">=&gt;</span> <span class="nv">duckduckgo.com</span>
+</pre></div>
+
+<p>In this example <code>select-one</code> will return the first <code>get-async</code> response whose status is 200.  If for some reason all 3 fail then <code>select-one</code> will return <code>nil</code>.</p>
+
+<h3>
+<a name="first" class="anchor" href="#first"><span class="octicon octicon-link"></span></a><code>first</code>
+</h3>
+
+<p>A typical use case for <code>select-one</code> is to simply return the first future to be <code>realized</code> which is simple to implement using the <code>(fn [_] true)</code> predicate however this is more boilerplate than you really want.</p>
+
+<p><code>first</code> is a simple wrapper for <code>select-one</code> that takes care of sending in this predicate.  The following two forms do the same thing,</p>
+
+<div class="highlight highlight-clojure"><pre><span class="p">(</span><span class="nf">select-one</span>
+  <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">_</span><span class="p">]</span> <span class="nv">true</span><span class="p">)</span>
+  <span class="p">(</span><span class="nf">future</span> <span class="p">(</span><span class="nf">Thread/sleep</span> <span class="mi">200</span><span class="p">)</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="p">(</span><span class="nf">future</span> <span class="p">(</span><span class="nf">Thread/sleep</span> <span class="mi">100</span><span class="p">)</span> <span class="mi">2</span><span class="p">))</span>
+
+<span class="p">(</span><span class="nf">first</span>
+  <span class="p">(</span><span class="nf">future</span> <span class="p">(</span><span class="nf">Thread/sleep</span> <span class="mi">200</span><span class="p">)</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="p">(</span><span class="nf">future</span> <span class="p">(</span><span class="nf">Thread/sleep</span> <span class="mi">100</span><span class="p">)</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+
+<h3>
+<a name="select-many" class="anchor" href="#select-many"><span class="octicon octicon-link"></span></a><code>select-many</code>
+</h3>
+
+<p>Where <code>select-one</code> delivers the promise when the first resulting where the predicate is <code>true</code>, <code>select-many</code> will wait for all the futures to be <code>realized</code> and return a seq of <strong>all</strong> results that match the predicate.  </p>
+
+<p>For example if we wanted to check a bunch of pages to ensure they exist we could implement this using <code>select-many</code></p>
+
+<div class="highlight highlight-clojure"><pre><span class="p">(</span><span class="k">def </span><span class="nv">not-found-pages</span>
+  <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">response</span><span class="p">]</span> <span class="p">(</span><span class="nb">= </span><span class="mi">404</span> <span class="p">(</span><span class="ss">:status</span> <span class="nv">response</span><span class="p">)))</span>
+  <span class="p">(</span><span class="nf">get-async</span> <span class="s">"https://github.com/kouphax/happiness"</span><span class="p">)</span>  
+  <span class="p">(</span><span class="nf">get-async</span> <span class="s">"https://github.com/kouphax/sadness"</span><span class="p">)</span>
+  <span class="p">(</span><span class="nf">get-async</span> <span class="s">"https://github.com/kouphax/longing"</span><span class="p">)</span>
+  <span class="p">(</span><span class="nf">get-async</span> <span class="s">"https://github.com/kouphax/fulfilment"</span><span class="p">))</span>
+
+<span class="p">(</span><span class="nb">println </span><span class="p">(</span><span class="nb">map </span><span class="ss">:project-name</span> <span class="o">@</span><span class="nv">not-found-pages</span><span class="p">))</span>
+<span class="nv">=&gt;</span> <span class="p">[</span><span class="nv">happiness</span> <span class="nv">fulfilment</span><span class="p">]</span>
+</pre></div>
+
+<h3>
+<a name="all" class="anchor" href="#all"><span class="octicon octicon-link"></span></a><code>all</code>
+</h3>
+
+<p>A common use case for <code>select-many</code> is to fire off all the futures and wait until all the results have been collected and do something with those results.  As with <code>first</code> this is easy to implement using the <code>(fn [_] true)</code> predicate. </p>
+
+<p><code>all</code> is a simple wrapper for <code>select-many</code> that takes care of sending in this predicate.  The following two forms do the same thing,</p>
+
+<div class="highlight highlight-clojure"><pre><span class="p">(</span><span class="nf">select-many</span>
+  <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">_</span><span class="p">]</span> <span class="nv">true</span><span class="p">)</span>
+  <span class="p">(</span><span class="nf">future</span> <span class="p">(</span><span class="nf">Thread/sleep</span> <span class="mi">200</span><span class="p">)</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="p">(</span><span class="nf">future</span> <span class="p">(</span><span class="nf">Thread/sleep</span> <span class="mi">100</span><span class="p">)</span> <span class="mi">2</span><span class="p">))</span>
+
+<span class="p">(</span><span class="nf">all</span>
+  <span class="p">(</span><span class="nf">future</span> <span class="p">(</span><span class="nf">Thread/sleep</span> <span class="mi">200</span><span class="p">)</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="p">(</span><span class="nf">future</span> <span class="p">(</span><span class="nf">Thread/sleep</span> <span class="mi">100</span><span class="p">)</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+
+<h2>
+<a name="caveats" class="anchor" href="#caveats"><span class="octicon octicon-link"></span></a>Caveats</h2>
+
+<ul>
+<li>There is currently no internal support for timeouts.  If a future never returns then derefing the promise returned from these methods will block forever.  Timeout can be handled outside of these methods.</li>
+<li>Calling these methods will cause futures to be derefed immediatley even if they were originally part of a lazy-seq.</li>
+<li>There is currently no support for error handling which is likely needed for proper handling of timeouts (even if implemented externally).</li>
+</ul><h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>Copyright © 2014 James Hughes</p>
+
+<p>Distributed under the Eclipse Public License either version 1.0 or (at
+your option) any later version.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/kouphax">kouphax</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-19143623-5");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
