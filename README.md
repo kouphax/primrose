@@ -2,7 +2,7 @@
 
 A bunch of __experimental__ utility functions for working with collections of futures.
 
-[API Documentation](https://rawgit.com/kouphax/primrose/master/doc/index.html] (Temporary Location)
+[API Documentation](https://rawgit.com/kouphax/primrose/master/doc/index.html) (Temporary Location)
 
 ## Getting it
 
