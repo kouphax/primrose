@@ -55,7 +55,9 @@ I suggest using only the methods you need or namespacing the imported module (as
 
 ### `select-one`
 
-`select-one` takes a predicate and a set of futures and returns a promise that will eventually hold the value of the first future to return whos result is true for the given predicate.
+`select-one` takes a predicate and a set of futures and returns a promise that will eventually hold the value of the first future to return whos result is true for the given predicate.  
+
+To demonstrate this lets imagine we had a method called `get-async` that made a request to a website (off-thread via a future) and eventually returned a response object. Its fictional but you could use [clj-http](https://github.com/dakrone/clj-http) or [http.async.client](http://neotyk.github.io/http.async.client/) to achieve this behavior.
 
 ```clojure
 (def first-good-result
