@@ -98,11 +98,12 @@ For example if we wanted to check a bunch of pages to ensure they exist we could
 
 ```clojure
 (def not-found-pages
-  (fn [response] (= 404 (:status response)))
-  (get-async "https://github.com/kouphax/happiness")  
-  (get-async "https://github.com/kouphax/sadness")
-  (get-async "https://github.com/kouphax/longing")
-  (get-async "https://github.com/kouphax/fulfilment"))
+  (select-many
+    (fn [response] (= 404 (:status response)))
+    (get-async "https://github.com/kouphax/happiness")  
+    (get-async "https://github.com/kouphax/sadness")
+    (get-async "https://github.com/kouphax/longing")
+    (get-async "https://github.com/kouphax/fulfilment")))
   
 (println (map :project-name @not-found-pages))
 => [happiness fulfilment]
