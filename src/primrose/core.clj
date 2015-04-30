@@ -19,6 +19,7 @@
   (swap! counter dec))
 
 (defn- stop [counter]
+  (reset! counter 0)
   (remove-watch counter nil))
 
 (defn select-one
@@ -57,7 +58,7 @@
       (future
         (let [result @f]
           (when (predicate result)
-            (swap! data concat [@f]))
+            (swap! data concat [result]))
           (tick countdown))))
     promise))
 
