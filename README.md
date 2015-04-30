@@ -1,3 +1,5 @@
+[![Clojars Project](http://clojars.org/primrose/latest-version.svg)](http://clojars.org/primrose)
+
 # primrose
 
 A bunch of __experimental__ utility functions for working with collections of futures.
